@@ -1,6 +1,6 @@
-# Serverless Portfolio Template
+# Samoba's Serverless Portfolio Template
 
-A modern, high-performance, fully serverless portfolio platform built entirely on the Cloudflare developer ecosystem. Designed for developers looking for a fast, resilient, and virtually free way to host their professional presence.
+A modern, high-performance, fully serverless portfolio template constructed on the Cloudflare developer ecosystem by [Shawon Hossain Samoba](https://github.com/samoba-islam). Designed for developers looking for a fast, resilient, and virtually free way to host their professional presence.
 
 ![Open Source](https://img.shields.io/badge/Open%20Source-GPLv3-blue.svg)
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
@@ -41,8 +41,8 @@ Ensure you have the following installed on your machine:
 ### 2. Clone and Setup
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_GITHUB_USERNAME/portfolio-template.git
-cd portfolio-template
+git clone https://github.com/samoba-islam/cloudflare-portfolio-template.git
+cd cloudflare-portfolio-template
 
 # Securely install all dependencies (backend & frontend)
 npm install
