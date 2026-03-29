@@ -107,6 +107,14 @@ npm run deploy
 ```
 
 ---
+## 👤 Author
+
+**Shawon Hossain**
+
+- GitHub: [@samoba-islam](https://github.com/samoba-islam)
+- Website: [samoba.pages.dev](https://samoba.pages.dev)
+
+---
 
 ## 👩‍💻 Standard Customization
 You can log into `[your-deployed-domain]/admin` to easily edit Experience, Education, Technical Skills, and personal Profile data without editing the codebase.
