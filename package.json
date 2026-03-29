@@ -1,0 +1,23 @@
+{
+  "name": "samoba-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Professional portfolio platform for Shawon Hossain Samoba — Cloudflare Workers + D1 + R2",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm install && npm run build",
+    "deploy": "npm run build:frontend && wrangler deploy",
+    "db:migrate": "wrangler d1 execute portfolio-db --file=src/db/schema.sql",
+    "db:migrate:local": "wrangler d1 execute portfolio-db --local --file=src/db/schema.sql",
+    "db:seed": "wrangler d1 execute portfolio-db --file=src/db/seed.sql",
+    "db:seed:local": "wrangler d1 execute portfolio-db --local --file=src/db/seed.sql",
+    "db:reset:local": "npm run db:migrate:local && npm run db:seed:local",
+    "setup:local": "npm install && cd frontend && npm install && cd .. && npm run db:reset:local"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241230.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.77.0"
+  }
+}

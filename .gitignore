@@ -1,0 +1,29 @@
+# logs
+npm-debug.log
+yarn-error.log
+
+# dependencies
+node_modules/
+frontend/node_modules/
+
+# web build output
+dist/
+build/
+frontend/dist/
+
+# Cloudflare config output
+.wrangler/
+
+# Sensitive
+.env
+.dev.vars
+wrangler.toml
+src/db/seed.sql
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
