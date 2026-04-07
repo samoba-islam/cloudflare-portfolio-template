@@ -1,115 +1,267 @@
-# Samoba's Serverless Portfolio Template
+# Samoba Serverless Portfolio (Cloudflare + React)
 
-A modern, high-performance, fully serverless portfolio template constructed on the Cloudflare developer ecosystem by [Shawon Hossain Samoba](https://github.com/samoba-islam). Designed for developers looking for a fast, resilient, and virtually free way to host their professional presence.
+Production-ready portfolio platform with a public portfolio site, blog, contact system, and admin dashboard.  
+It runs fully serverless on Cloudflare Workers and uses D1 for data, KV for caching, and optional R2 for file storage.
 
-![Open Source](https://img.shields.io/badge/Open%20Source-GPLv3-blue.svg)
-![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
-![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?style=flat&logo=cloudflare&logoColor=white)
+## Maintained By
 
-## ✨ Features
-* **Lightning Fast:** Serves content globally from the edge using Cloudflare Workers.
-* **Serverless Backend:** Built with Hono/TypeScript directly onto Cloudflare's edge network.
-* **Integrated Database:** Utilizes Cloudflare D1 (Serverless SQL Database) with automated local migrations.
-* **Edge Caching:** Cloudflare KV Namespace support for extremely fast reads and caching.
-* **Dynamic Frontend:** Built top-to-bottom in React using Vite, featuring dynamic dynamic theme options and smooth animations.
-* **Admin Dashboard:** Access your personalized dashboard at `/admin` to modify your profile, read contact forms, manage blog posts, and easily update credentials.
+- **Shawon Hossain Samoba**
+- **GitHub:** [@samoba-islam](https://github.com/samoba-islam)
+- **Template Purpose:** Production-ready serverless portfolio starter for developers
 
-## 🛠 Tech Stack
+![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![Frontend](https://img.shields.io/badge/Frontend-React%2018-61DAFB?logo=react&logoColor=white)
+![Backend](https://img.shields.io/badge/Backend-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)
+![Database](https://img.shields.io/badge/Database-Cloudflare%20D1-FFCC00)
 
-**Frontend:**
-- **React.js** (Vite) for fast rendering & building
-- Vanilla CSS and CSS grid architecture for ultra-lightweight styling
-- React Router DOM for simple native navigation
+## Overview
 
-**Backend:**
-- **Cloudflare Workers** handles all API connections & edge logic natively
-- **Cloudflare D1** (SQLite edge structure) for persistent relational data 
-- **Cloudflare KV** for key-value pair state management and caching
-- **TypeScript** ensures robust, typed integrations
+This project includes:
 
----
+- A modern public portfolio homepage (`/`) with sections for hero, about, skills, experience, education, projects, achievements, blog preview, and contact.
+- A blog listing page (`/blog`) and blog post detail page (`/blog/:slug`) with markdown content support.
+- An admin authentication flow (`/login`) and protected admin panel (`/admin`) for content management.
+- A serverless REST API under `/api/*` for all portfolio and dashboard operations.
+- Deployment-ready Cloudflare configuration (Workers + static assets + D1 + KV, optional R2).
 
-## 🚀 Quick Start Guide
+## What You Can Manage From Admin
 
-### 1. Prerequisites
-Ensure you have the following installed on your machine:
-- [Node.js](https://nodejs.org/) (v16 or higher)
-- [npm](https://www.npmjs.com/)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed via `npm install -g wrangler`
-- A free [Cloudflare Account](https://dash.cloudflare.com/sign-up)
+Inside `/admin`, the dashboard provides CRUD management for:
 
-### 2. Clone and Setup
+- Profile
+- Experience
+- Education
+- Projects
+- Skills
+- Achievements
+- Blog posts (draft/published states)
+- Contact messages (read/unread + deletion)
+- Admin credentials (email/password update)
+- Dashboard stats + recent message summary
+
+## Tech Stack
+
+### Frontend
+
+- React 18 + Vite
+- React Router
+- React Markdown + `remark-gfm`
+- Vanilla CSS (custom design system)
+- Theme context (dark/light mode persistence in `localStorage`)
+
+### Backend
+
+- Cloudflare Workers (TypeScript)
+- Cloudflare D1 (SQLite at the edge)
+- Cloudflare KV (API response caching)
+- Optional Cloudflare R2 (file upload and serving)
+- JWT-based authentication
+
+## Architecture
+
+- `frontend/dist` is built and served as static assets by Cloudflare.
+- Worker handles `/api/*` routes first (`run_worker_first`).
+- Public content is fetched from D1.
+- Frequently requested resources are cached in KV.
+- Admin routes require `Authorization: Bearer <token>`.
+- File uploads use R2 when configured.
+
+## Project Structure
+
+```txt
+portfolio/
+├─ src/                      # Worker backend (TypeScript)
+│  ├─ db/                    # schema.sql + seed.example.sql
+│  ├─ middleware/            # auth, cache, cors
+│  ├─ routes/                # API route handlers
+│  ├─ utils/                 # jwt, password, validation, response
+│  ├─ index.ts               # router entry point
+│  └─ types.ts               # env + model typings
+├─ frontend/                 # React + Vite app
+│  ├─ src/
+│  │  ├─ api/                # API client wrapper
+│  │  ├─ components/         # portfolio + admin UI components
+│  │  ├─ context/            # auth + theme providers
+│  │  └─ pages/              # route pages
+│  └─ vite.config.js
+├─ .github/workflows/        # CI/CD deployment workflow
+├─ wrangler.example.toml     # Cloudflare template config
+└─ package.json              # root scripts
+```
+
+## API Surface (Summary)
+
+### Public endpoints
+
+- `GET /api/profile`
+- `GET /api/experience`
+- `GET /api/education`
+- `GET /api/projects`
+- `GET /api/skills`
+- `GET /api/achievements`
+- `GET /api/blog`
+- `GET /api/blog/:slug`
+- `POST /api/contact`
+- `GET /api/files/:key` (R2 file serving)
+
+### Auth/admin endpoints
+
+- `POST /api/login`
+- `POST /api/setup` (one-time account bootstrap using setup key)
+- `PUT /api/admin/settings`
+- CRUD: `/api/experience`, `/api/education`, `/api/projects`, `/api/skills`, `/api/achievements`, `/api/blog`
+- Contacts admin: `GET /api/contacts`, `PUT /api/contacts/:id/read`, `DELETE /api/contacts/:id`
+- Files admin: `POST /api/upload`, `DELETE /api/upload/:key`
+- `GET /api/dashboard/stats`
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Wrangler CLI (`npm i -g wrangler`)
+- Cloudflare account
+
+## Quick Start
+
+### 1. Install dependencies
+
 ```bash
-# Clone the repository
-git clone https://github.com/samoba-islam/cloudflare-portfolio-template.git
-cd cloudflare-portfolio-template
-
-# Securely install all dependencies (backend & frontend)
 npm install
 cd frontend && npm install && cd ..
 ```
 
-### 3. Configure Cloudflare Resources
-You must tell Cloudflare to generate the respective resources so the application can communicate correctly.
-Run the following commands using the terminal:
+### 2. Configure Cloudflare resources
 
-1. **Create the D1 Database:**
-   ```bash
-   wrangler d1 create portfolio-db
-   ```
-   *Take note of the `database_id` returned by this command.*
+Create resources and keep the generated IDs:
 
-2. **Create the KV Namespace:**
-   ```bash
-   wrangler kv:namespace create "CACHE"
-   ```
-   *Take note of the `id` returned by this command.*
-
-### 4. Create your `wrangler.toml` file
-We provide a sanitized generic template because you shouldn't commit your credentials.
-1. Copy the `wrangler.example.toml` template into `wrangler.toml`:
-   ```bash
-   cp wrangler.example.toml wrangler.toml
-   ```
-2. Open `wrangler.toml` and replace:
-   - `<YOUR_CLOUDFLARE_ACCOUNT_ID>` with your Cloudflare Account ID (located in your Cloudflare dashboard under Workers & Pages » Overview).
-   - `<YOUR_DATABASE_ID>` with the ID generated in Step 3.
-   - `<YOUR_KV_NAMESPACE_ID>` with the ID generated in Step 3.
-   - `<YOUR_CUSTOM_DOMAIN_OR_PAGES_DEV>` with your frontend domain so CORS headers run natively.
-
-### 5. Setup your Seed Configuration
-1. Initialize the table logic for your database by running migrations.
-   ```bash
-   npm run db:migrate:local
-   ```
-2. Copy `src/db/seed.example.sql` and name it `src/db/seed.sql` to populate it with customized database models. 
-3. After editing `seed.sql` with your credentials, name, and background:
-   ```bash
-   npm run db:seed:local
-   ```
-> **Note:** The default generated admin email is `admin@example.com` and the default password hash resolves to `admin123`. We recommend generating your own password hash using the `src/utils/password.ts` logic.
-
-### 6. Test Locally Built
-To run both the serverless backend and the React frontend simultaneously:
 ```bash
-# Start frontend process
-cd frontend
-npm run dev
-
-# Open a new terminal to spin up local wrangler container
-wrangler dev
+wrangler d1 create portfolio-db
+wrangler kv namespace create CACHE
 ```
 
-### 7. Deployment
-Deploy everything globally across Cloudflare's network:
+Optional (for file upload support):
+
+```bash
+wrangler r2 bucket create portfolio-files
+```
+
+### 3. Create `wrangler.toml`
+
+Copy template:
+
+```bash
+cp wrangler.example.toml wrangler.toml
+```
+
+Update placeholders in `wrangler.toml`:
+
+- `account_id`
+- `database_name` and `database_id`
+- KV namespace `id`
+- `CORS_ORIGIN`
+
+If using R2, add a bucket binding:
+
+```toml
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "portfolio-files"
+```
+
+### 4. Set required secret
+
+The Worker requires `JWT_SECRET`:
+
+```bash
+wrangler secret put JWT_SECRET
+```
+
+Use a long random value in production.
+
+### 5. Initialize database
+
+Create `src/db/seed.sql` from example:
+
+```bash
+cp src/db/seed.example.sql src/db/seed.sql
+```
+
+Then run:
+
+```bash
+npm run db:migrate:local
+npm run db:seed:local
+```
+
+## Local Development
+
+Run frontend and Worker in separate terminals:
+
+```bash
+# terminal 1
+npm run dev:frontend
+
+# terminal 2
+npm run dev
+```
+
+- Frontend: `http://localhost:5173`
+- Worker API: local Wrangler URL
+
+## First Admin Login
+
+After seeding example data:
+
+- Email: `admin@example.com`
+- Password: `admin123`
+
+Strongly recommended:
+
+- Change credentials immediately from Admin > Settings.
+- Replace seed values before production.
+- Rotate `JWT_SECRET` for live deployments.
+
+## Build and Deploy
+
 ```bash
 npm run deploy
 ```
 
----
+This command:
 
-## 👩‍💻 Standard Customization
-You can log into `[your-deployed-domain]/admin` to easily edit Experience, Education, Technical Skills, and personal Profile data without editing the codebase.
+1. Builds frontend assets.
+2. Deploys Worker + assets to Cloudflare.
 
-## 📄 License
-This project is officially licensed under the [GNU General Public License v3.0 (GPLv3)](LICENSE). You are free to redistribute, study, and modify the system entirely as long as derivative networks stay open-source.
+## CI/CD
+
+GitHub Actions workflow (`.github/workflows/deploy.yml`) deploys on push to `main`.
+
+Required repository secrets:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+## Available Root Scripts
+
+- `npm run dev` - Run Wrangler locally
+- `npm run dev:frontend` - Run Vite frontend
+- `npm run build:frontend` - Build frontend assets
+- `npm run deploy` - Build frontend + deploy Worker
+- `npm run db:migrate` - Apply schema to remote D1
+- `npm run db:migrate:local` - Apply schema to local D1
+- `npm run db:seed` - Seed remote D1
+- `npm run db:seed:local` - Seed local D1
+- `npm run db:reset:local` - Local migrate + seed
+- `npm run setup:local` - Install deps + reset local DB
+
+## Notes and Best Practices
+
+- Keep `wrangler.toml` and secrets out of public repositories.
+- Restrict `CORS_ORIGIN` to your real frontend domain in production.
+- R2 is optional; upload endpoints return `503` if R2 is not configured.
+- Blog tags are stored as JSON strings; keep a consistent tag format.
+- Cache invalidation is already wired for content mutation routes.
+
+## License
+
+Licensed under [GNU GPL v3](LICENSE).
