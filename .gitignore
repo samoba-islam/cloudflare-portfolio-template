@@ -27,3 +27,5 @@ src/db/seed.sql
 *.ntvs*
 *.njsproj
 *.sln
+test-login.js
+test-setup.js
