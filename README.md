@@ -227,7 +227,19 @@ Strongly recommended:
 npm run deploy
 ```
 
+<<<<<<< HEAD
 This command:
+=======
+---
+## 👤 Author
+
+**Shawon Hossain**
+
+- GitHub: [@samoba-islam](https://github.com/samoba-islam)
+- Website: [samoba.pages.dev](https://samoba.pages.dev)
+
+---
+>>>>>>> e3127824329a4068f54fa9c6b890ff0dc2e04d7f
 
 1. Builds frontend assets.
 2. Deploys Worker + assets to Cloudflare.
