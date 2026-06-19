@@ -59,8 +59,10 @@ Inside `/admin`, the dashboard provides CRUD management for:
 
 ## Architecture
 
-- `frontend/dist` is built and served as static assets by Cloudflare.
-- Worker handles `/api/*` routes first (`run_worker_first`).
+- Frontend can run in two deployment modes:
+  - Integrated mode: `frontend/dist` is built and served as static assets by Cloudflare Worker assets.
+  - Standalone mode: frontend is deployed separately to Cloudflare Pages and calls the Worker API over HTTPS.
+- Worker handles `/api/*` routes first (`run_worker_first`) in integrated mode.
 - Public content is fetched from D1.
 - Frequently requested resources are cached in KV.
 - Admin routes require `Authorization: Bearer <token>`.
@@ -130,6 +132,18 @@ npm install
 cd frontend && npm install && cd ..
 ```
 
+Create frontend env file:
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+If you deploy frontend separately (Cloudflare Pages), set:
+
+- `VITE_API_BASE_URL=https://<YOUR_WORKER_DOMAIN>/api`
+
+For integrated mode, you can leave `VITE_API_BASE_URL` empty so frontend uses relative `/api`.
+
 ### 2. Configure Cloudflare resources
 
 Create resources and keep the generated IDs:
@@ -158,7 +172,7 @@ Update placeholders in `wrangler.toml`:
 - `account_id`
 - `database_name` and `database_id`
 - KV namespace `id`
-- `CORS_ORIGIN`
+- `CORS_ORIGIN` (set this to your Cloudflare Pages domain in standalone mode)
 
 If using R2, add a bucket binding:
 
@@ -206,7 +220,27 @@ npm run dev
 ```
 
 - Frontend: `http://localhost:5173`
-- Worker API: local Wrangler URL
+- Worker API: local Wrangler URL (default proxy target is `http://localhost:8787`)
+
+For local standalone-style testing:
+
+- Set `frontend/.env` with `VITE_API_BASE_URL=http://localhost:8787/api`.
+- Keep `CORS_ORIGIN` in `wrangler.toml` dev vars as `http://localhost:5173`.
+
+## Standalone Frontend on Cloudflare Pages
+
+Use this when frontend and backend are deployed separately.
+
+1. Deploy backend Worker first (same as current API deployment flow).
+2. Keep Worker `CORS_ORIGIN` set to your Pages domain.
+3. In Cloudflare Pages project settings, add:
+   - `VITE_API_BASE_URL=https://<YOUR_WORKER_DOMAIN>/api`
+4. Configure Pages build:
+   - Framework preset: `Vite`
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Root directory: `frontend`
+5. SPA routes are already supported through `frontend/public/_redirects`.
 
 ## First Admin Login
 
@@ -221,7 +255,7 @@ Strongly recommended:
 - Replace seed values before production.
 - Rotate `JWT_SECRET` for live deployments.
 
-## Build and Deploy
+## Build and Deploy (Integrated Mode)
 
 ```bash
 npm run deploy
@@ -230,6 +264,14 @@ npm run deploy
 
 1. Builds frontend assets.
 2. Deploys Worker + assets to Cloudflare.
+
+## Deploy Backend Only (for Standalone Pages Frontend)
+
+If frontend is on Pages, deploy API backend separately:
+
+```bash
+wrangler deploy
+```
 
 ## CI/CD
 

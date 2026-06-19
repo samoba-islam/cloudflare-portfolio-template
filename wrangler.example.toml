@@ -26,6 +26,8 @@ id = "<YOUR_KV_NAMESPACE_ID>"
 [vars]
 ENVIRONMENT = "production"
 CORS_ORIGIN = "https://<YOUR_CUSTOM_DOMAIN_OR_PAGES_DEV>"
+# Optional: comma-separated allowlist for multiple frontend domains
+# CORS_ORIGINS = "https://<YOUR_PAGES_DOMAIN>,https://<YOUR_CUSTOM_DOMAIN>"
 
 # Dev environment overrides
 [env.dev]

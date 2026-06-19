@@ -10,6 +10,7 @@ export interface Env {
   JWT_SECRET: string;
   ENVIRONMENT: string;
   CORS_ORIGIN: string;
+  CORS_ORIGINS?: string;
 }
 
 // Database row types

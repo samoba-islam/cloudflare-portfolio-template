@@ -1,8 +1,52 @@
 // ============================================================
-// API Client — Fetch wrapper for backend communication
+// API Client - Fetch wrapper for backend communication
 // ============================================================
 
-const API_BASE = '/api';
+const rawApiBase = (import.meta.env.VITE_API_BASE_URL || '').trim();
+const API_BASE = rawApiBase ? rawApiBase.replace(/\/+$/, '') : '/api';
+const API_ORIGIN = (() => {
+  try {
+    return new URL(API_BASE).origin;
+  } catch {
+    return '';
+  }
+})();
+
+function toAbsoluteApiUrl(urlValue) {
+  if (!API_ORIGIN || typeof urlValue !== 'string') return urlValue;
+  if (!urlValue.startsWith('/api/')) return urlValue;
+
+  try {
+    return new URL(urlValue, API_ORIGIN).toString();
+  } catch {
+    return urlValue;
+  }
+}
+
+function normalizeApiUrls(value, parentKey = '') {
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeApiUrls(item, parentKey));
+  }
+
+  if (value && typeof value === 'object') {
+    const normalizedObject = {};
+    for (const [key, childValue] of Object.entries(value)) {
+      const isUrlField = key === 'url' || key.endsWith('_url');
+      if (typeof childValue === 'string' && isUrlField) {
+        normalizedObject[key] = toAbsoluteApiUrl(childValue);
+      } else {
+        normalizedObject[key] = normalizeApiUrls(childValue, key);
+      }
+    }
+    return normalizedObject;
+  }
+
+  if (typeof value === 'string' && (parentKey === 'url' || parentKey.endsWith('_url'))) {
+    return toAbsoluteApiUrl(value);
+  }
+
+  return value;
+}
 
 class ApiClient {
   constructor() {
@@ -31,7 +75,7 @@ class ApiClient {
 
     const token = this.getToken();
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${token}`;
     }
 
     // Remove Content-Type for FormData
@@ -49,10 +93,17 @@ class ApiClient {
           : undefined,
     });
 
-    const data = await response.json();
+    const contentType = response.headers.get('Content-Type') || '';
+    const rawData = contentType.includes('application/json')
+      ? await response.json()
+      : await response.text();
+    const data = normalizeApiUrls(rawData);
 
     if (!response.ok) {
-      throw new Error(data.error || data.message || 'API request failed');
+      const message = data && typeof data === 'object'
+        ? data.error || data.message
+        : '';
+      throw new Error(message || 'API request failed');
     }
 
     return data;

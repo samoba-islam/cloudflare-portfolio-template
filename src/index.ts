@@ -132,7 +132,7 @@ export default {
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
-      return handleOptions(env);
+      return handleOptions(request, env);
     }
 
     // Worker only receives /api/* requests (configured via run_worker_first in wrangler.toml)
@@ -147,15 +147,16 @@ export default {
         if (match) {
           const params = match.groups || {};
           const response = await route.handler(request, env, params);
-          return addCorsHeaders(response, env);
+          return addCorsHeaders(response, request, env);
         }
       }
 
-      return addCorsHeaders(notFound('API endpoint not found'), env);
+      return addCorsHeaders(notFound('API endpoint not found'), request, env);
     } catch (error) {
       console.error('API Error:', error);
       return addCorsHeaders(
         serverError(error instanceof Error ? error.message : 'Internal server error'),
+        request,
         env
       );
     }

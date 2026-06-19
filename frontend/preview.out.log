@@ -1,0 +1,8 @@
+
+> samoba-portfolio-frontend@1.0.0 preview:pages
+> vite preview --host 0.0.0.0 --port 4173
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://172.10.10.22:[1m4173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.65.1:[1m4173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.40.1:[1m4173[22m/[39m
